@@ -5,6 +5,7 @@
   "main": "lib/lockcheck.js",
   "scripts": {
     "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
     "test": "mocha"
   },
   "repository": {
@@ -18,6 +19,11 @@
   },
   "homepage": "https://github.com/43081j/lockcheck#readme",
   "devDependencies": {
+    "@types/node": "^13.1.1",
+    "prettier": "^1.19.1",
     "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "commander": "^4.0.1"
   }
 }
