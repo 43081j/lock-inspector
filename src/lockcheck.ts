@@ -1,24 +1,20 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {PackageLock, PackageLockError} from './PackageLock';
-import * as program from 'commander';
 import {VisitorOptions} from './Visitor';
 import {InsecureUriVisitor} from './visitors/InsecureUriVisitor';
 import {
   ManifestInconsistencyVisitor
 } from './visitors/ManifestInconsistencyVisitor';
 
-program
-  .description(
-    `Analyzes package-lock.json files for potential problems
-    and differences if git is available`
-  )
-  .option('-d, --dir <path>', 'Path to directory containing lock file.', '.')
-  .parse(process.argv);
-
 type Options = VisitorOptions;
 
-const processFile = async (opts: Options): Promise<void> => {
+/**
+ * Analyzes the lock-file of a given directory
+ * @param opts Options to create analyzer with
+ * @param opts.path Path of directory to analyze
+ */
+export async function lockcheck(opts: Options): Promise<void> {
   const lockFilePath = `${opts.path}${path.sep}package-lock.json`;
   let lockData: PackageLock;
   let lockFile: string;
@@ -56,24 +52,4 @@ const processFile = async (opts: Options): Promise<void> => {
     (err as (Error & {messages: Set<PackageLockError>})).messages = errors;
     throw err;
   }
-};
-
-if (program.dir) {
-  processFile({
-    path: program.dir as string
-  })
-    .then(() => {
-      console.log('Lock file passed checks.');
-    })
-    .catch((err) => {
-      if (err.messages) {
-        for (const msg of err.messages) {
-          console.log(msg);
-        }
-      } else {
-        console.log(err.message);
-      }
-
-      process.exit(1);
-    });
 }
