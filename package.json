@@ -1,0 +1,19 @@
+{
+  "name": "lockcheck",
+  "version": "0.0.1",
+  "description": "Determines changes in package-lock.json files",
+  "main": "lib/lockcheck.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/43081j/lockcheck.git"
+  },
+  "author": "James Garbutt (https://github.com/43081j)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/43081j/lockcheck/issues"
+  },
+  "homepage": "https://github.com/43081j/lockcheck#readme"
+}
