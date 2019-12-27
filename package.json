@@ -4,6 +4,7 @@
   "description": "Determines changes in package-lock.json files",
   "main": "lib/lockcheck.js",
   "scripts": {
+    "build": "tsc",
     "test": "mocha"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/43081j/lockcheck/issues"
   },
-  "homepage": "https://github.com/43081j/lockcheck#readme"
+  "homepage": "https://github.com/43081j/lockcheck#readme",
+  "devDependencies": {
+    "typescript": "^3.7.4"
+  }
 }
