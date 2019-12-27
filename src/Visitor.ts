@@ -4,11 +4,20 @@ import {
   PackageLockError
 } from './PackageLock';
 
+export interface VisitorOptions {
+  path: string;
+}
+
 /**
  * Base implementation of a package-lock visitor.
  */
 export abstract class Visitor {
   public errors: Set<PackageLockError> = new Set();
+  protected options: VisitorOptions;
+
+  constructor(opts: VisitorOptions) {
+    this.options = opts;
+  }
 
   /**
    * Visits a given package lock object
