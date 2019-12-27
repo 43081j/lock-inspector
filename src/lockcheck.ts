@@ -52,9 +52,9 @@ const processFile = async (opts: Options): Promise<void> => {
   }
 
   if (errors.size > 0) {
-    throw {
-      message: errors
-    };
+    const err = new Error();
+    (err as (Error & {messages: Set<PackageLockError>})).messages = errors;
+    throw err;
   }
 };
 
@@ -66,8 +66,8 @@ if (program.dir) {
       console.log('Lock file passed checks.');
     })
     .catch((err) => {
-      if (Array.isArray(err.message)) {
-        for (const msg of err.message) {
+      if (err.messages) {
+        for (const msg of err.messages) {
           console.log(msg);
         }
       } else {

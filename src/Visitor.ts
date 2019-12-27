@@ -13,9 +13,13 @@ export interface VisitorOptions {
  */
 export abstract class Visitor {
   public errors: Set<PackageLockError> = new Set();
-  protected options: VisitorOptions;
+  public options: VisitorOptions;
 
-  constructor(opts: VisitorOptions) {
+  /**
+   * @param opts Options
+   * @param opts.path Path of directory being analyzed
+   */
+  public constructor(opts: VisitorOptions) {
     this.options = opts;
   }
 

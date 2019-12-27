@@ -22,7 +22,9 @@ export class ManifestInconsistencyVisitor extends Visitor {
     let manifest: PackageManifest;
 
     try {
-      const manifestContents = await readFile(manifestPath, {encoding: 'utf-8'});
+      const manifestContents = await readFile(manifestPath, {
+        encoding: 'utf-8'
+      });
       manifest = JSON.parse(manifestContents);
     } catch (err) {
       // early exit if no package manifest readable
@@ -38,7 +40,10 @@ export class ManifestInconsistencyVisitor extends Visitor {
       if (Object.prototype.hasOwnProperty.call(data.dependencies, dep)) {
         const lockVersion = data.dependencies[dep].version;
         const manifestVersion = manifestDeps[dep];
-        if (manifestVersion && !semver.satisfies(lockVersion, manifestVersion)) {
+        if (
+          manifestVersion &&
+          !semver.satisfies(lockVersion, manifestVersion)
+        ) {
           this.errors.add({
             message: `Dependency "${dep}" version mismatch. ${lockVersion}
               from lock-file does not satisfy ${manifestVersion}.`
