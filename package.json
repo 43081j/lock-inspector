@@ -1,5 +1,5 @@
 {
-  "name": "lockcheck",
+  "name": "@43081j/lockcheck",
   "version": "0.0.1",
   "description": "Determines changes in package-lock.json files",
   "main": "lib/lockcheck.js",

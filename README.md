@@ -6,7 +6,7 @@ inconsistencies and security issues.
 ### Install
 
 ```
-$ npm i -D lockcheck
+$ npm i -D @43081j/lockcheck
 ```
 
 ### Use
