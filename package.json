@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Determines changes in package-lock.json files",
   "main": "lib/lockcheck.js",
-  "bin": "lib/cli.js",
+  "bin": "./lib/cli.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build:ts": "tsc",
     "build": "npm run lint && npm run build:ts",
