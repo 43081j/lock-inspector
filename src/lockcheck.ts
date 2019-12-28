@@ -49,7 +49,7 @@ export async function lockcheck(opts: Options): Promise<void> {
 
   if (errors.size > 0) {
     const err = new Error();
-    (err as (Error & {messages: Set<PackageLockError>})).messages = errors;
+    (err as Error & {messages: Set<PackageLockError>}).messages = errors;
     throw err;
   }
 }

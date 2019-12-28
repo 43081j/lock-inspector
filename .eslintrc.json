@@ -34,6 +34,7 @@
       "requireReturnType": false,
       "requireReturn": false
     }],
+    "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/explicit-function-return-type": ["error", {
       "allowExpressions": true
     }],
