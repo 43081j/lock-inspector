@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {PackageLock, PackageLockError} from './PackageLock';
+import {PackageLock} from './PackageLock';
 import {VisitorOptions} from './Visitor';
 import {InsecureUriVisitor} from './visitors/InsecureUriVisitor';
+import {GitDiffVisitor} from './visitors/GitDiffVisitor';
+import {DuplicateVersionsVisitor} from './visitors/DuplicateVersionsVisitor';
 import {
   ManifestInconsistencyVisitor
 } from './visitors/ManifestInconsistencyVisitor';
@@ -31,25 +33,19 @@ export async function lockcheck(opts: Options): Promise<void> {
     throw new Error(`Error: Could not parse lock file "${lockFilePath}"`);
   }
 
-  const visitors = [
-    new InsecureUriVisitor(opts),
-    new ManifestInconsistencyVisitor(opts)
-  ];
-  const errors = new Set<PackageLockError>();
+  const visitors = opts.outputDiff
+    ? [new GitDiffVisitor(opts)]
+    : [
+        new InsecureUriVisitor(opts),
+        new ManifestInconsistencyVisitor(opts),
+        new DuplicateVersionsVisitor(opts)
+      ];
 
   for (const visitor of visitors) {
     await visitor.visit(lockData);
-
-    if (visitor.errors.size > 0) {
-      for (const err of visitor.errors) {
-        errors.add(err);
-      }
-    }
   }
 
-  if (errors.size > 0) {
-    const err = new Error();
-    (err as Error & {messages: Set<PackageLockError>}).messages = errors;
-    throw err;
+  if (visitors.some((v) => v.hasErrors())) {
+    throw new Error('Package lock file failed validation.');
   }
 }

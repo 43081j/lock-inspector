@@ -8,24 +8,23 @@ program
     and differences if git is available`
   )
   .option('-d, --dir <path>', 'Path to directory containing lock file.', '.')
+  .option('--diff', 'Enable diff mode.')
   .parse(process.argv);
 
 if (program.dir) {
-  lockcheck({
+  const opts = {
+    outputDiff: program.diff !== undefined,
     path: program.dir as string
-  })
+  };
+
+  lockcheck(opts)
     .then(() => {
-      console.log('Lock file passed checks.');
+      if (!opts.outputDiff) {
+        console.log('Lock file passed checks.');
+      }
     })
     .catch((err) => {
-      if (err.messages) {
-        for (const msg of err.messages) {
-          console.log(msg);
-        }
-      } else {
-        console.log(err.message);
-      }
-
+      console.log(err.message);
       process.exit(1);
     });
 }

@@ -1,19 +1,18 @@
-import {
-  PackageLock,
-  PackageLockDependency,
-  PackageLockError
-} from './PackageLock';
+import {PackageLock, PackageLockDependency} from './PackageLock';
+import {Logger} from './Logger';
 
 export interface VisitorOptions {
   path: string;
+  outputDiff?: boolean;
 }
 
 /**
  * Base implementation of a package-lock visitor.
  */
 export abstract class Visitor {
-  public errors: Set<PackageLockError> = new Set();
   public options: VisitorOptions;
+
+  protected _log: Logger = new Logger();
 
   /**
    * @param opts Options
@@ -38,6 +37,14 @@ export abstract class Visitor {
     name: string,
     data: PackageLockDependency
   ): Promise<void>;
+
+  /**
+   * Determines whether this visitor has errored/warned or not
+   * @returns whether visitor has errors or not
+   */
+  public hasErrors(): boolean {
+    return this._log.errors > 0 || this._log.warnings > 0;
+  }
 
   /**
    * Visits each dependency in a given set of dependencies

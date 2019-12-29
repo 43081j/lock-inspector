@@ -22,9 +22,9 @@ export class InsecureUriVisitor extends Visitor {
     }
 
     if (data.resolved && data.resolved.startsWith('http://')) {
-      this.errors.add({
-        message: `Insecure URL for dependency "${name}": ${data.resolved}`
-      });
+      this._log.error(`"${name}" has an insecure URL:`);
+      this._log.log('*', data.resolved);
+      this._log.empty();
     }
   }
 }

@@ -44,10 +44,10 @@ export class ManifestInconsistencyVisitor extends Visitor {
           manifestVersion &&
           !semver.satisfies(lockVersion, manifestVersion)
         ) {
-          this.errors.add({
-            message: `Dependency "${dep}" version mismatch. ${lockVersion}
-              from lock-file does not satisfy ${manifestVersion}.`
-          });
+          this._log.error(
+            `"${dep}" has a version mismatch.`,
+            `${lockVersion} from lock-file does not satisfy ${manifestVersion}.`
+          );
         }
       }
     }
@@ -55,17 +55,9 @@ export class ManifestInconsistencyVisitor extends Visitor {
 
   /** @inheritdoc */
   public async visitDependency(
-    name: string,
-    data: PackageLockDependency
+    _name: string,
+    _data: PackageLockDependency
   ): Promise<void> {
-    if (data.dependencies) {
-      await this._visitDependencies(data.dependencies);
-    }
-
-    if (data.resolved && data.resolved.startsWith('http://')) {
-      this.errors.add({
-        message: `Insecure URL for dependency "${name}": ${data.resolved}`
-      });
-    }
+    return Promise.resolve();
   }
 }

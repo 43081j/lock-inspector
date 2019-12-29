@@ -1,11 +1,3 @@
-export interface PackageLockError {
-  message: string;
-  position?: {
-    line: number;
-    column: number;
-  };
-}
-
 export interface PackageLockDependency {
   version: string;
   resolved: string;
