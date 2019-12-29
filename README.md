@@ -3,6 +3,14 @@
 A tiny utility to analyze package-lock.json files for potential problems,
 inconsistencies and security issues.
 
+`lockcheck` will detect:
+
+* Non-HTTPS URLs
+* Manifest version mismatches (i.e. lock-file version does
+not match `package.json` version)
+* Multiple distinct URLs for an individual dependency (by
+version)
+
 ### Install
 
 ```
