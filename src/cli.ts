@@ -32,8 +32,8 @@ program
     and differences if git is available`
   )
   .option('-d, --dir <path>', 'Path to directory containing lock file.', '.')
-  .option('--diff', 'Enable diff mode.')
-  .option('-v, --verbose', 'Use more verbose logging')
+  .option('--diff', 'Enable diff mode')
+  .option('-v, --verbose', 'Verbose output')
   .parse(process.argv);
 
 if (program.dir) {

@@ -19,7 +19,28 @@ $ npx lockcheck
 
 ```
   -d, --dir <path>  Path to directory containing lock file. (default: ".")
+  --diff            Enable diff mode
+  -v, --verbose     Verbose output
   -h, --help        output usage information
+```
+
+### Diff mode
+
+You can diff two lock files like so:
+
+```
+$ npx lockcheck --diff
+```
+
+This will attempt to use git in order to compare the lock
+file on disk and the original lock file in git (assuming
+there is a difference).
+
+Alternatively, you can pipe a lock file into lockcheck to
+compare against:
+
+```
+$ git show :package-lock.json | npx lockcheck --diff
 ```
 
 ### License
