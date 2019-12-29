@@ -19,7 +19,7 @@ export class DuplicateVersionsVisitor extends Visitor {
             `"${pkg.name}" has multiple URLs for a version ${version}:`
           );
           for (const url of urls) {
-            this._log.log('*', url);
+            this._log.log('-', url);
           }
           this._log.empty();
         }

@@ -1,6 +1,30 @@
 #!/usr/bin/env node
 import * as program from 'commander';
-import {lockcheck} from './lockcheck';
+import {stdin} from 'process';
+import {lockcheck, Options} from './lockcheck';
+
+const inputResult = new Promise<string>((res) => {
+  let result = '';
+
+  if (stdin.isTTY) {
+    res(result);
+    return;
+  }
+
+  stdin.setEncoding('utf8');
+
+  stdin.on('readable', () => {
+    let chunk;
+
+    while ((chunk = stdin.read()) !== null) {
+      result += chunk;
+    }
+  });
+
+  stdin.on('end', () => {
+    res(result);
+  });
+});
 
 program
   .description(
@@ -9,17 +33,25 @@ program
   )
   .option('-d, --dir <path>', 'Path to directory containing lock file.', '.')
   .option('--diff', 'Enable diff mode.')
+  .option('-v, --verbose', 'Use more verbose logging')
   .parse(process.argv);
 
 if (program.dir) {
-  const opts = {
-    outputDiff: program.diff !== undefined,
-    path: program.dir as string
+  const opts: Options = {
+    diffMode: program.diff !== undefined,
+    path: program.dir as string,
+    verbose: program.verbose === true
   };
 
-  lockcheck(opts)
+  inputResult
+    .then((input) => {
+      if (input && input.trim() !== '') {
+        opts.diffSource = input;
+      }
+      return lockcheck(opts);
+    })
     .then(() => {
-      if (!opts.outputDiff) {
+      if (!opts.diffMode) {
         console.log('Lock file passed checks.');
       }
     })

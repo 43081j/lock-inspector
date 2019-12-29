@@ -3,7 +3,9 @@ import {Logger} from './Logger';
 
 export interface VisitorOptions {
   path: string;
-  outputDiff?: boolean;
+  diffMode?: boolean;
+  diffSource?: string;
+  verbose?: boolean;
 }
 
 /**

@@ -9,7 +9,7 @@ import {
   ManifestInconsistencyVisitor
 } from './visitors/ManifestInconsistencyVisitor';
 
-type Options = VisitorOptions;
+export type Options = VisitorOptions;
 
 /**
  * Analyzes the lock-file of a given directory
@@ -33,7 +33,7 @@ export async function lockcheck(opts: Options): Promise<void> {
     throw new Error(`Error: Could not parse lock file "${lockFilePath}"`);
   }
 
-  const visitors = opts.outputDiff
+  const visitors = opts.diffMode
     ? [new GitDiffVisitor(opts)]
     : [
         new InsecureUriVisitor(opts),

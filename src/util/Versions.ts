@@ -2,7 +2,7 @@ import {PackageLockDependency} from '../PackageLock';
 
 export interface VersionSet {
   name: string;
-  versions: Map<string, string[]>;
+  versions: Map<string, Set<string>>;
 }
 
 const cachedResults = new WeakMap<

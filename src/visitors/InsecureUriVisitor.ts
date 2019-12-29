@@ -23,7 +23,7 @@ export class InsecureUriVisitor extends Visitor {
 
     if (data.resolved && data.resolved.startsWith('http://')) {
       this._log.error(`"${name}" has an insecure URL:`);
-      this._log.log('*', data.resolved);
+      this._log.log('-', data.resolved);
       this._log.empty();
     }
   }
