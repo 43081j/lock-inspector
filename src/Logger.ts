@@ -14,7 +14,7 @@ export class Logger {
    * @param messages Messages to log
    */
   public warn(...messages: unknown[]): void {
-    this.log('warn', chalk.keyword('orange')('[WARN]'), ...messages);
+    this.logWithLevel('warn', chalk.keyword('orange')('[WARN]'), ...messages);
 
     this.warnings++;
   }
@@ -24,7 +24,7 @@ export class Logger {
    * @param messages Messages to log
    */
   public error(...messages: unknown[]): void {
-    this.log('error', chalk.keyword('red')('[ERROR]'), ...messages);
+    this.logWithLevel('error', chalk.keyword('red')('[ERROR]'), ...messages);
 
     this.errors++;
   }
@@ -34,7 +34,7 @@ export class Logger {
    * @param messages Messages to log
    */
   public info(...messages: unknown[]): void {
-    this.log('info', chalk.keyword('cyan')('[INFO]'), ...messages);
+    this.logWithLevel('info', chalk.keyword('cyan')('[INFO]'), ...messages);
   }
 
   /**
