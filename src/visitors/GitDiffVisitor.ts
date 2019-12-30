@@ -49,12 +49,13 @@ export class GitDiffVisitor extends Visitor {
 
       if (!previousPkg) {
         this._log.log(name);
-        this._log.log('+', chalk.keyword('green')(name));
-        this._log.empty();
+        for (const v of pkg.versions.keys()) {
+          this._log.log('+', chalk.keyword('green')(v));
+        }
       } else {
         const removedVersions = new Set(previousPkg.versions.keys());
         const addedVersions = new Set<string>();
-        const changedVersions = new Map<string, Array<unknown[]>>();
+        const changedVersions = new Set<unknown[]>();
 
         for (const [v, urls] of pkg.versions) {
           removedVersions.delete(v);
@@ -67,18 +68,20 @@ export class GitDiffVisitor extends Visitor {
             const newUrls = [...urls].filter((u) => !oldVersion.has(u));
             const oldUrls = [...oldVersion].filter((u) => !urls.has(u));
 
-            const changedVersion = changedVersions.get(v) ?? [];
+            for (const url of oldUrls) {
+              changedVersions.add([
+                '-',
+                chalk.dim.keyword('yellow')(v),
+                chalk.keyword('red')(`[${url}]`)
+              ]);
+            }
 
             for (const url of newUrls) {
-              changedVersion.push(['+', chalk.keyword('green')(url)]);
-            }
-
-            for (const url of oldUrls) {
-              changedVersion.push(['-', chalk.keyword('red')(url)]);
-            }
-
-            if (changedVersion.length > 0) {
-              changedVersions.set(v, changedVersion);
+              changedVersions.add([
+                '+',
+                chalk.dim.keyword('yellow')(v),
+                chalk.keyword('green')(`[${url}]`)
+              ]);
             }
           }
         }
@@ -99,15 +102,10 @@ export class GitDiffVisitor extends Visitor {
           }
 
           if (changedVersions.size > 0) {
-            for (const [v, messages] of changedVersions.entries()) {
-              this._log.log(chalk.keyword('orange')(`@${v}`));
-              for (const message of messages) {
-                this._log.log(...message);
-              }
+            for (const messages of changedVersions) {
+              this._log.log(...messages);
             }
           }
-
-          this._log.empty();
         }
       }
     }
