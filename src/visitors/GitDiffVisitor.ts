@@ -13,7 +13,7 @@ const execCommand = util.promisify(exec);
 export class GitDiffVisitor extends Visitor {
   /** @inheritdoc */
   public async visit(data: PackageLock): Promise<void> {
-    let headData: PackageLock;
+    let previousData: PackageLock;
 
     try {
       let diffSource = this.options.diffSource;
@@ -25,102 +25,84 @@ export class GitDiffVisitor extends Visitor {
         diffSource = stdout;
       }
 
-      headData = JSON.parse(diffSource);
+      previousData = JSON.parse(diffSource);
     } catch (err) {
       // Eat up the errors for now as we just couldn't get hold of git
       return;
     }
 
-    const dataVersions = data.dependencies
+    const currentVersions = data.dependencies
       ? computeVersions(data.dependencies)
       : new Map<string, VersionSet>();
-    const headVersions = headData.dependencies
-      ? computeVersions(headData.dependencies)
+    const previousVersions = previousData.dependencies
+      ? computeVersions(previousData.dependencies)
       : new Map<string, VersionSet>();
 
-    const newPackages = [...dataVersions.keys()].filter(
-      (k) => !headVersions.has(k)
-    );
-    const removedPackages = [...headVersions.keys()].filter(
-      (k) => !dataVersions.has(k)
-    );
-
-    if (newPackages.length > 0) {
-      this._log.info('New Packages:', newPackages);
+    for (const pkg of previousVersions.keys()) {
+      if (!currentVersions.has(pkg)) {
+        this._log.log('-', chalk.keyword('red')(pkg));
+      }
     }
 
-    if (removedPackages.length > 0) {
-      this._log.info('Removed Packages:', removedPackages);
-    }
+    for (const [name, pkg] of currentVersions.entries()) {
+      const previousPkg = previousVersions.get(name);
 
-    for (const [name, pkg] of dataVersions.entries()) {
-      const headPkg = headVersions.get(name);
-      if (headPkg) {
-        const newVersions = [...pkg.versions.keys()]
-          .filter((k) => !headPkg.versions.has(k));
-        const removedVersions = [...headPkg.versions.keys()]
-          .filter((k) => !pkg.versions.has(k));
-        const changedVersions = [...pkg.versions.entries()]
-          .filter(([k, v]) => {
-            const headVal = headPkg.versions.get(k);
-            return headVal !== undefined &&
-              (v.size !== headVal.size ||
-                ![...v].every((num) => headVal.has(num)));
-          });
+      if (!previousPkg) {
+        this._log.log(name);
+        this._log.log('+', chalk.keyword('green')(name));
+        this._log.empty();
+      } else {
+        const removedVersions = new Set(previousPkg.versions.keys());
+        const addedVersions = new Set<string>();
+        const changedVersions = new Map<string, Array<unknown[]>>();
 
-        if (newVersions.length > 0 ||
-          changedVersions.length > 0 ||
-          removedVersions.length > 0) {
-          this._log.info(`Package "${name}" changed:`);
+        for (const [v, urls] of pkg.versions) {
+          removedVersions.delete(v);
 
-          if (newVersions.length > 0) {
-            for (const v of newVersions) {
-              this._log.log(
-                '-',
-                chalk.keyword('green')(v)
-              );
+          const oldVersion = previousPkg.versions.get(v);
+
+          if (!oldVersion) {
+            addedVersions.add(v);
+          } else {
+            const newUrls = [...urls].filter((u) => !oldVersion.has(u));
+            const oldUrls = [...oldVersion].filter((u) => !urls.has(u));
+
+            const changedVersion = changedVersions.get(v) ?? [];
+
+            for (const url of newUrls) {
+              changedVersion.push(['+', chalk.keyword('green')(url)]);
+            }
+
+            for (const url of oldUrls) {
+              changedVersion.push(['-', chalk.keyword('red')(url)]);
+            }
+
+            if (changedVersion.length > 0) {
+              changedVersions.set(v, changedVersion);
             }
           }
+        }
 
-          if (removedVersions.length > 0) {
-            for (const v of removedVersions) {
-              this._log.log(
-                '-',
-                chalk.keyword('red')(v)
-              );
-            }
+        if (
+          removedVersions.size > 0 ||
+          addedVersions.size > 0 ||
+          changedVersions.size > 0
+        ) {
+          this._log.log(name);
+
+          for (const v of removedVersions) {
+            this._log.log('-', chalk.keyword('red')(v));
           }
 
-          if (changedVersions.length > 0) {
-            for (const [v, urls] of changedVersions) {
-              const oldVersion = headPkg.versions.get(v);
+          for (const v of addedVersions) {
+            this._log.log('+', chalk.keyword('green')(v));
+          }
 
-              if (!oldVersion) {
-                continue;
-              }
-
-              this._log.log(
-                '-',
-                chalk.keyword('orange')('[URL CHANGE]'),
-                v
-              );
-
-              for (const url of urls) {
-                if (!oldVersion.has(url)) {
-                  this._log.log(
-                    ' ',
-                    chalk.keyword('green')(url)
-                  );
-                }
-              }
-
-              for (const url of oldVersion) {
-                if (!urls.has(url)) {
-                  this._log.log(
-                    ' ',
-                    chalk.keyword('red')(url)
-                  );
-                }
+          if (changedVersions.size > 0) {
+            for (const [v, messages] of changedVersions.entries()) {
+              this._log.log(chalk.keyword('orange')(`@${v}`));
+              for (const message of messages) {
+                this._log.log(...message);
               }
             }
           }

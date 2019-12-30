@@ -1,5 +1,7 @@
 import * as chalk from 'chalk';
 
+export type LogLevel = 'default' | 'warn' | 'info' | 'error';
+
 /**
  * Handler for logging messages
  */
@@ -12,7 +14,7 @@ export class Logger {
    * @param messages Messages to log
    */
   public warn(...messages: unknown[]): void {
-    console.warn(chalk.keyword('orange')('[WARN]'), ...messages);
+    this.log('warn', chalk.keyword('orange')('[WARN]'), ...messages);
 
     this.warnings++;
   }
@@ -22,7 +24,7 @@ export class Logger {
    * @param messages Messages to log
    */
   public error(...messages: unknown[]): void {
-    console.warn(chalk.keyword('red')('[ERROR]'), ...messages);
+    this.log('error', chalk.keyword('red')('[ERROR]'), ...messages);
 
     this.errors++;
   }
@@ -32,7 +34,7 @@ export class Logger {
    * @param messages Messages to log
    */
   public info(...messages: unknown[]): void {
-    console.warn(chalk.keyword('cyan')('[INFO]'), ...messages);
+    this.log('info', chalk.keyword('cyan')('[INFO]'), ...messages);
   }
 
   /**
@@ -40,13 +42,35 @@ export class Logger {
    * @param messages Messages to log
    */
   public log(...messages: unknown[]): void {
-    console.log(...messages);
+    this.logWithLevel('default', ...messages);
+  }
+
+  /**
+   * Logs messages with a level
+   * @param level Logging level to use
+   * @param messages Messages to log
+   */
+  public logWithLevel(level: LogLevel, ...messages: unknown[]): void {
+    switch (level) {
+      case 'error':
+        console.error(...messages);
+        break;
+      case 'warn':
+        console.warn(...messages);
+        break;
+      case 'info':
+        console.info(...messages);
+        break;
+      default:
+        console.log(...messages);
+        break;
+    }
   }
 
   /**
    * Logs an empty line
    */
   public empty(): void {
-    console.log('');
+    this.log('');
   }
 }
