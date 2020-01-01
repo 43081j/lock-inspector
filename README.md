@@ -3,13 +3,23 @@
 A tiny utility to analyze package-lock.json files for potential problems,
 inconsistencies and security issues.
 
-`lockcheck` will detect:
+### Validators
 
-* Non-HTTPS URLs
-* Manifest version mismatches (i.e. lock-file version does
-not match `package.json` version)
-* Multiple distinct URLs for an individual dependency (by
-version)
+`lockcheck` will analyze lock files for the following:
+
+*Insecure URIs* - Any `http` URIs are considered unsafe and should be replaced
+with secure equivalents.
+
+*Duplicate versions* - Multiple occurrences of a single package with different
+URLs is a sign of a possibly misconfigured lock file.
+
+*Manifest inconsistencies* - Packages which exist in the lock file but
+do not match/satisfy the corresponding entry in `package.json` are likely
+misconfigured.
+
+*Registry inconsistencies* - Unscoped packages in a lock file should all
+have the same registry. It is valid, however, to have scoped packages
+use a separate registry.
 
 ### Install
 
