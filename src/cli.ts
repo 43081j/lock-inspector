@@ -32,7 +32,8 @@ program
     and differences if git is available`
   )
   .option('-d, --dir <path>', 'Path to directory containing lock file.', '.')
-  .option('--diff', 'Enable diff mode')
+  .option('--diff [commit]', 'Enable diff mode on the specified git' +
+    'commit (default is against unchanged file in current branch)')
   .option('-v, --verbose', 'Verbose output')
   .parse(process.argv);
 
@@ -42,6 +43,10 @@ if (program.dir) {
     path: program.dir as string,
     verbose: program.verbose === true
   };
+
+  if (typeof program.diff === 'string') {
+    opts.diffCommit = program.diff;
+  }
 
   inputResult
     .then((input) => {

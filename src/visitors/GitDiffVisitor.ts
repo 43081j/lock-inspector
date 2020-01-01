@@ -1,41 +1,30 @@
-import {Visitor} from '../Visitor';
+import {Visitor, VisitorOptions} from '../Visitor';
 import {PackageLock, PackageLockDependency} from '../PackageLock';
-import * as util from 'util';
-import {exec} from 'child_process';
 import {computeVersions, VersionSet} from '../util/Versions';
 import * as chalk from 'chalk';
-
-const execCommand = util.promisify(exec);
 
 /**
  * Outputs a diff of underlying dependency changes
  */
 export class GitDiffVisitor extends Visitor {
+  protected _sourceData: PackageLock;
+
+  /**
+   * @param opts Visitor options
+   * @param sourceData Source to diff against
+   */
+  public constructor(opts: VisitorOptions, sourceData: PackageLock) {
+    super(opts);
+    this._sourceData = sourceData;
+  }
+
   /** @inheritdoc */
   public async visit(data: PackageLock): Promise<void> {
-    let previousData: PackageLock;
-
-    try {
-      let diffSource = this.options.diffSource;
-
-      if (!diffSource) {
-        const {stdout} = await execCommand('git show :package-lock.json', {
-          cwd: this.options.path
-        });
-        diffSource = stdout;
-      }
-
-      previousData = JSON.parse(diffSource);
-    } catch (err) {
-      // Eat up the errors for now as we just couldn't get hold of git
-      return;
-    }
-
     const currentVersions = data.dependencies
       ? computeVersions(data.dependencies)
       : new Map<string, VersionSet>();
-    const previousVersions = previousData.dependencies
-      ? computeVersions(previousData.dependencies)
+    const previousVersions = this._sourceData.dependencies
+      ? computeVersions(this._sourceData.dependencies)
       : new Map<string, VersionSet>();
 
     for (const pkg of previousVersions.keys()) {

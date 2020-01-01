@@ -4,6 +4,7 @@ import {Logger} from './Logger';
 export interface VisitorOptions {
   path: string;
   diffMode?: boolean;
+  diffCommit?: string;
   diffSource?: string;
   verbose?: boolean;
 }
