@@ -19,7 +19,8 @@ $ npx lockcheck
 
 ```
   -d, --dir <path>  Path to directory containing lock file. (default: ".")
-  --diff            Enable diff mode
+  --diff [commit]   Enable diff mode on the specified gitcommit (default is
+                    against unchanged file in current branch)
   -v, --verbose     Verbose output
   -h, --help        output usage information
 ```
@@ -59,6 +60,12 @@ compare against:
 
 ```
 $ git show :package-lock.json | npx lockcheck --diff
+```
+
+Or you can specify a commit-ish:
+
+```
+$ npx lockcheck --diff master
 ```
 
 ### License
