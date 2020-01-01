@@ -8,6 +8,9 @@ import {DuplicateVersionsVisitor} from './visitors/DuplicateVersionsVisitor';
 import {
   ManifestInconsistencyVisitor
 } from './visitors/ManifestInconsistencyVisitor';
+import {
+  RegistryInconsistencyVisitor
+} from './visitors/RegistryInconsistencyVisitor';
 
 export type Options = VisitorOptions;
 
@@ -38,7 +41,8 @@ export async function lockcheck(opts: Options): Promise<void> {
     : [
         new InsecureUriVisitor(opts),
         new ManifestInconsistencyVisitor(opts),
-        new DuplicateVersionsVisitor(opts)
+        new DuplicateVersionsVisitor(opts),
+        new RegistryInconsistencyVisitor(opts)
       ];
 
   for (const visitor of visitors) {
