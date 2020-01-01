@@ -5,7 +5,7 @@ import {exec} from 'child_process';
 import {PackageLock} from './PackageLock';
 import {Visitor, VisitorOptions} from './Visitor';
 import {InsecureUriVisitor} from './visitors/InsecureUriVisitor';
-import {GitDiffVisitor} from './visitors/GitDiffVisitor';
+import {DiffVisitor} from './visitors/DiffVisitor';
 import {DuplicateVersionsVisitor} from './visitors/DuplicateVersionsVisitor';
 import {
   ManifestInconsistencyVisitor
@@ -64,7 +64,7 @@ export async function lockcheck(opts: Options): Promise<void> {
       }
     }
 
-    visitors.push(new GitDiffVisitor(opts, diffSource));
+    visitors.push(new DiffVisitor(opts, diffSource));
   } else {
     visitors.push(...[
       new InsecureUriVisitor(opts),

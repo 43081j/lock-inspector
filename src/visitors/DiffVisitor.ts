@@ -6,7 +6,7 @@ import * as chalk from 'chalk';
 /**
  * Outputs a diff of underlying dependency changes
  */
-export class GitDiffVisitor extends Visitor {
+export class DiffVisitor extends Visitor {
   protected _sourceData: PackageLock;
 
   /**
