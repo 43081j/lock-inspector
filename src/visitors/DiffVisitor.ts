@@ -38,27 +38,44 @@ export class DiffVisitor extends Visitor {
 
       if (!previousPkg) {
         this._log.log(name);
-        for (const v of pkg.versions.keys()) {
-          this._log.log('+', chalk.keyword('green')(v));
+        for (const [v, urls] of pkg.versions.entries()) {
+          for (const url of urls) {
+            this._log.log(
+              '+',
+              chalk.keyword('green')(v),
+              chalk.dim.keyword('green')(`[${url}]`)
+            );
+          }
         }
       } else {
-        const removedVersions = new Set(previousPkg.versions.keys());
-        const addedVersions = new Set<string>();
-        const changedVersions = new Set<unknown[]>();
+        const messages = new Set<string[]>();
+
+        for (const v of previousPkg.versions.keys()) {
+          if (!pkg.versions.has(v)) {
+            messages.add([
+              '-',
+              chalk.keyword('red')(v)
+            ]);
+          }
+        }
 
         for (const [v, urls] of pkg.versions) {
-          removedVersions.delete(v);
-
           const oldVersion = previousPkg.versions.get(v);
 
           if (!oldVersion) {
-            addedVersions.add(v);
+            for (const url of urls) {
+              messages.add([
+                '+',
+                chalk.keyword('green')(v),
+                chalk.dim.keyword('green')(`[${url}]`)
+              ]);
+            }
           } else {
             const newUrls = [...urls].filter((u) => !oldVersion.has(u));
             const oldUrls = [...oldVersion].filter((u) => !urls.has(u));
 
             for (const url of oldUrls) {
-              changedVersions.add([
+              messages.add([
                 '-',
                 chalk.dim.keyword('yellow')(v),
                 chalk.keyword('red')(`[${url}]`)
@@ -66,7 +83,7 @@ export class DiffVisitor extends Visitor {
             }
 
             for (const url of newUrls) {
-              changedVersions.add([
+              messages.add([
                 '+',
                 chalk.dim.keyword('yellow')(v),
                 chalk.keyword('green')(`[${url}]`)
@@ -75,25 +92,11 @@ export class DiffVisitor extends Visitor {
           }
         }
 
-        if (
-          removedVersions.size > 0 ||
-          addedVersions.size > 0 ||
-          changedVersions.size > 0
-        ) {
+        if (messages.size > 0) {
           this._log.log(name);
 
-          for (const v of removedVersions) {
-            this._log.log('-', chalk.keyword('red')(v));
-          }
-
-          for (const v of addedVersions) {
-            this._log.log('+', chalk.keyword('green')(v));
-          }
-
-          if (changedVersions.size > 0) {
-            for (const messages of changedVersions) {
-              this._log.log(...messages);
-            }
+          for (const message of messages) {
+            this._log.log(...message);
           }
         }
       }
