@@ -1,6 +1,6 @@
 {
   "name": "lock-inspector",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Analyses package-lock files for inconsistencies and problems.",
   "main": "lib/inspector.js",
   "bin": {
