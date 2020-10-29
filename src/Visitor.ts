@@ -3,9 +3,7 @@ import {Logger} from './Logger';
 
 export interface VisitorOptions {
   path: string;
-  diffMode?: boolean;
-  diffCommit?: string;
-  diffSource?: string;
+  gitCompare?: string;
   verbose?: boolean;
 }
 

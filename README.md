@@ -1,4 +1,4 @@
-## lockcheck
+## lock-inspector
 
 A tiny utility to analyze package-lock.json files for potential problems,
 inconsistencies and security issues.
@@ -6,28 +6,28 @@ inconsistencies and security issues.
 ### Install
 
 ```
-$ npm i -D @43081j/lockcheck
+$ npm i -D lock-inspector
 ```
 
 ### Use
 
 ```
-$ npx lockcheck
+$ npx lock-inspector
 ```
 
 ### Options
 
 ```
-  -d, --dir <path>  Path to directory containing lock file. (default: ".")
-  --diff [commit]   Enable diff mode on the specified gitcommit (default is
-                    against unchanged file in current branch)
-  -v, --verbose     Verbose output
-  -h, --help        output usage information
+  -d, --dir <path>         Path to directory containing lock file. (default: ".")
+  --git-compare [commit]   Output the differences between the current lock file
+                           and a specific git commit.
+  -v, --verbose            Verbose output
+  -h, --help               output usage information
 ```
 
-### Validators
+### Rules
 
-`lockcheck` will analyze lock files for the following:
+Lock files will be analysed for the following:
 
 **Insecure URIs** - Any `http` URIs are considered unsafe and should be replaced
 with secure equivalents.
@@ -43,30 +43,17 @@ misconfigured.
 have the same registry. It is valid, however, to have scoped packages
 use a separate registry.
 
-### Diff mode
+### Git comparison mode
 
-You can diff two lock files like so:
+You can compare to a previous version of your lock file using git compare mode:
 
 ```
-$ npx lockcheck --diff
+$ npx lock-inspector --git-compare master
 ```
 
 This will attempt to use git in order to compare the lock
 file on disk and the original lock file in git (assuming
 there is a difference).
-
-Alternatively, you can pipe a lock file into lockcheck to
-compare against:
-
-```
-$ git show :package-lock.json | npx lockcheck --diff
-```
-
-Or you can specify a commit-ish:
-
-```
-$ npx lockcheck --diff master
-```
 
 ### License
 

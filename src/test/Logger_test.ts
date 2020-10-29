@@ -1,24 +1,24 @@
 import {Logger, LogLevel} from '../Logger';
 import {expect} from 'chai';
-import * as sinon from 'sinon';
+import * as hanbi from 'hanbi';
 
 describe('Logger', () => {
   let logger: Logger;
-  let logStub: sinon.SinonStub<[LogLevel, ...unknown[]]>;
+  let logStub: hanbi.Stub<(level: LogLevel, ...rest: unknown[]) => void>;
 
   beforeEach(() => {
     logger = new Logger();
-    logStub = sinon.stub(logger, 'logWithLevel');
+    logStub = hanbi.stubMethod(logger, 'logWithLevel');
   });
 
   afterEach(() => {
-    sinon.restore();
+    hanbi.restore();
   });
 
   describe('warn', () => {
     it('should log a warning', () => {
       logger.warn('foo', 'bar');
-      const args = logStub.lastCall.args;
+      const args = logStub.lastCall!.args;
 
       expect(args[0]).to.equal('warn');
       expect(args[2]).to.equal('foo');
@@ -35,7 +35,7 @@ describe('Logger', () => {
   describe('error', () => {
     it('should log an error', () => {
       logger.error('foo', 'bar');
-      const args = logStub.lastCall.args;
+      const args = logStub.lastCall!.args;
 
       expect(args[0]).to.equal('error');
       expect(args[2]).to.equal('foo');
@@ -52,7 +52,7 @@ describe('Logger', () => {
   describe('info', () => {
     it('should log a message', () => {
       logger.info('foo', 'bar');
-      const args = logStub.lastCall.args;
+      const args = logStub.lastCall!.args;
 
       expect(args[0]).to.equal('info');
       expect(args[2]).to.equal('foo');
@@ -63,7 +63,7 @@ describe('Logger', () => {
   describe('log', () => {
     it('should log a default-level message', () => {
       logger.log('foo', 'bar');
-      const args = logStub.lastCall.args;
+      const args = logStub.lastCall!.args;
 
       expect(args[0]).to.equal('default');
       expect(args[1]).to.equal('foo');
@@ -74,7 +74,7 @@ describe('Logger', () => {
   describe('empty', () => {
     it('should log an empty line', () => {
       logger.empty();
-      expect(logStub.lastCall.args).to.deep.equal(['default', '']);
+      expect(logStub.lastCall!.args).to.deep.equal(['default', '']);
     });
   });
 });

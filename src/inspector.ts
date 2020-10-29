@@ -23,7 +23,7 @@ export type Options = VisitorOptions;
  * @param opts Options to create analyzer with
  * @param opts.path Path of directory to analyze
  */
-export async function lockcheck(opts: Options): Promise<void> {
+export async function inspector(opts: Options): Promise<void> {
   const lockFilePath = `${opts.path}${path.sep}package-lock.json`;
   let lockData: PackageLock;
   let lockFile: string;
@@ -42,36 +42,31 @@ export async function lockcheck(opts: Options): Promise<void> {
 
   const visitors: Visitor[] = [];
 
-  if (opts.diffMode) {
+  visitors.push(...[
+    new InsecureUriVisitor(opts),
+    new ManifestInconsistencyVisitor(opts),
+    new DuplicateVersionsVisitor(opts),
+    new RegistryInconsistencyVisitor(opts)
+  ]);
+
+  if (opts.gitCompare) {
     let diffSource: PackageLock;
+    const diffCommit = opts.gitCompare ?? '';
+    if (!diffCommit.match(/^[\w^]+$/)) {
+      throw new Error('Specified commit was of an invalid format.');
+    }
 
-    if (opts.diffSource) {
-      diffSource = JSON.parse(opts.diffSource);
-    } else {
-      const diffCommit = opts.diffCommit ?? '';
-      if (!diffCommit.match(/^[\w^]*$/)) {
-        throw new Error('Specified commit was of an invalid format.');
-      }
+    try {
+      const {stdout} = await execCommand(`git show ${diffCommit}:package-lock.json`, {
+        cwd: opts.path
+      });
 
-      try {
-        const {stdout} = await execCommand(`git show ${diffCommit}:package-lock.json`, {
-          cwd: opts.path
-        });
-
-        diffSource = JSON.parse(stdout);
-      } catch (err) {
-        throw new Error('Specified commit could not be retrieved.');
-      }
+      diffSource = JSON.parse(stdout);
+    } catch (err) {
+      throw new Error('Specified commit could not be retrieved.');
     }
 
     visitors.push(new DiffVisitor(opts, diffSource));
-  } else {
-    visitors.push(...[
-      new InsecureUriVisitor(opts),
-      new ManifestInconsistencyVisitor(opts),
-      new DuplicateVersionsVisitor(opts),
-      new RegistryInconsistencyVisitor(opts)
-    ]);
   }
 
   for (const visitor of visitors) {

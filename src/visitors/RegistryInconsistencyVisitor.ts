@@ -25,6 +25,13 @@ export class RegistryInconsistencyVisitor extends Visitor {
       }
     }
 
+    if (this.options.verbose) {
+      this._log.log('Registries used:');
+      for (const registry of registries) {
+        this._log.log('-', registry);
+      }
+    }
+
     if (registries.size !== 1) {
       this._log.warn(
         `Multiple registries referenced for unscoped dependencies:`
