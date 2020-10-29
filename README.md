@@ -3,6 +3,23 @@
 A tiny utility to analyze package-lock.json files for potential problems,
 inconsistencies and security issues.
 
+### Why?
+
+The `package-lock.json` file is used to recreate the exact filesystem
+structure for a project rather than depending on the loosely defined
+versions in `package.json`.
+
+Due to this, it is quite possible that someone could introduce lock file
+changes which are either problematic or even malicious while leaving the
+`package.json` file untouched.
+
+Also, it is often an overlooked file in code reviews due to its size and
+verbosity.
+
+The combination of these two potential problems can lead to a seemingly
+good looking pull request being merged which actually introduces problems
+(malicious or not).
+
 ### Install
 
 ```
